@@ -1,0 +1,159 @@
+
+<head>
+<style>
+  @import 'https://fonts.googleapis.com/css?family=Fjalla+One';
+  *{
+    color:white;
+    font-family: 'Fjalla One', sans-serif;
+  }
+  body{
+    background-color: black;
+    overflow:hidden;
+    /*rgba(0,0,0,0);*/
+  }
+  h1{
+    text-align: center;
+    display:none;
+    position:relative;
+  }
+  #selectables{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  #selectables a{
+    margin: 4px;
+    padding:6px;
+  }
+  #selectables a div{
+    display:block;
+    height:5px;
+    width:5px;
+    border:1px solid white;
+  }
+</style>
+</head>
+<body>
+  <div id="headings">
+  </div>
+  <div id="selectables">
+  </div>
+</body>
+<script>
+  var textSlider = (function(){
+    //
+    //    JOHANNA: HÄR UNDER I VARIABELN "text" KAN DU FYLLA I VAD DU VILL HA
+    //    OBS!  Ha "" Runt texten, och separera på varje textsnutt med ett ,
+    //          Precis som på exemplena här nedan!
+    //          Därefter har du "interval" som bestämmer hur lång tid det tar mellan
+    //          Varje byte i millisekunder (1000ms = 1sek)
+    //
+    var text        =  [
+          "Wireless Communication Systems",
+          "Radar Systems",
+          "Signal Processing"
+        ],
+        intervalMS  = 5000,
+    //
+    //    HÄREFTER behöver du inte göra något! =)
+    //
+        animation   = 300,
+        shortAnim   = 150,
+        body        =  document.getElementById("headings"),
+        slct        =  document.getElementById("selectables"),
+        fill       = "white",
+        transparent = "rgba(0,0,0,0)",
+        active  = 0,
+        linkID      = "link",
+        headID      = "hd",
+        headings    = [],
+        divs        = [];
+
+
+    var populate = function(){
+      for (var i = 0; i<text.length;i++){
+        appendHeading(text[i],i);
+        appendListItem(i);
+      }
+    }
+    var appendHeading = function(string, i){
+        var h1 = document.createElement("h1");
+        h1.setAttribute("id", headID+i);
+        h1.innerHTML = string;
+        h1.style.transition = "left "+animation+"ms, display "+shortAnim+"ms";
+        headings.push(h1);
+        body.appendChild(h1);
+        if (i==0)
+          h1.style.display ="block";
+    }
+    var appendListItem = function(i){
+        var a   = document.createElement("a"),
+            div = document.createElement("div");
+        a.setAttribute("id", linkID+i);
+        a.href=("#");
+        a.addEventListener("click", clickedItem);
+        a.appendChild(div);
+        slct.appendChild(a);
+        divs.push(div);
+        if(i==0)
+          div.style["background-color"] = fill;
+    }
+    var clickedItem = function(evt){
+      evt.preventDefault();
+      var newActive = Number(
+        this.id.substring(linkID.length, this.id.length)
+      );
+      changeLink(newActive);
+      swipeText(newActive);
+    }
+    var changeLink = function (newActive){
+      if(newActive == active)
+        return;
+      divs[newActive].style["background-color"] = fill;
+      divs[active].style["background-color"] = transparent;
+    }
+    var swipeText = function(newText){
+      if(newText < active)
+        return swipeRight(newText);
+      swipeLeft(newText);
+    }
+    var swipeLeft = function(newActive){
+      var _active = active;
+      headings[_active].style.left ="-500px";
+      headings[newActive].style.left ="+500px";
+      setTimeout(function(){
+        headings[_active].style.display ="none";
+        headings[newActive].style.display = "block";
+        setTimeout(function(){
+          headings[newActive].style.left ="0px";
+        },10);
+      },animation-shortAnim);
+      changeLink(newActive);
+      active = newActive;
+    }
+    var swipeRight = function(newActive){
+      var _active = active;
+      headings[_active].style.left ="+500px";
+      headings[newActive].style.left ="-500px";
+      setTimeout(function(){
+        headings[_active].style.display ="none";
+        headings[newActive].style.display ="block";
+        setTimeout(function(){
+          headings[newActive].style.left ="0px";
+        },10);
+      },animation-shortAnim);
+      changeLink(newActive);
+      active = newActive;
+    }
+    var changeText = function(){
+        setTimeout(function(){
+          var newText = (active+1) % text.length;
+          swipeText(newText);
+          changeText();
+        }, intervalMS);
+    }
+    populate();
+    changeText();
+  })();
+</script>
