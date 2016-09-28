@@ -7,6 +7,7 @@
     font-family: 'Fjalla One', sans-serif;
   }
   body{
+    margin-top: 100px;
     background-color: black;
     overflow:hidden;
     /*rgba(0,0,0,0);*/
@@ -15,6 +16,7 @@
     text-align: center;
     display:none;
     position:relative;
+    font-size: 55px;
   }
   #selectables{
     width: 100%;
@@ -68,7 +70,8 @@
         linkID      = "link",
         headID      = "hd",
         headings    = [],
-        divs        = [];
+        divs        = [],
+        timeout     = setInterval(changeText, intervalMS);
 
 
     var populate = function(){
@@ -81,7 +84,7 @@
         var h1 = document.createElement("h1");
         h1.setAttribute("id", headID+i);
         h1.innerHTML = string;
-        h1.style.transition = "left "+animation+"ms, display "+shortAnim+"ms";
+        h1.style.transition = "left "+animation+"ms ease-in, display "+shortAnim+"ms";
         headings.push(h1);
         body.appendChild(h1);
         if (i==0)
@@ -101,6 +104,8 @@
     }
     var clickedItem = function(evt){
       evt.preventDefault();
+      clearInterval(timeout);
+      timeout = setInterval(changeText, intervalMS);
       var newActive = Number(
         this.id.substring(linkID.length, this.id.length)
       );
@@ -128,7 +133,7 @@
         setTimeout(function(){
           headings[newActive].style.left ="0px";
         },10);
-      },animation-shortAnim);
+      },animation);
       changeLink(newActive);
       active = newActive;
     }
@@ -142,16 +147,13 @@
         setTimeout(function(){
           headings[newActive].style.left ="0px";
         },10);
-      },animation-shortAnim);
+      },animation);
       changeLink(newActive);
       active = newActive;
     }
     var changeText = function(){
-        setTimeout(function(){
-          var newText = (active+1) % text.length;
-          swipeText(newText);
-          changeText();
-        }, intervalMS);
+      var newText = (active+1) % text.length;
+      swipeText(newText);
     }
     populate();
     changeText();
