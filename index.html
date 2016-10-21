@@ -1,14 +1,10 @@
 
 <head>
+  <meta name="viewport" content="initial-scale=1">
 <style>
-  @import 'https://fonts.googleapis.com/css?family=Fjalla+One';
-  *{
-    color:white;
-    font-family: 'Fjalla One', sans-serif;
-  }
   body{
-    margin-top: 100px;
-    background-color: black;
+    margin: 0px;
+    padding: 0px;
     overflow:hidden;
     /*rgba(0,0,0,0);*/
   }
@@ -32,12 +28,22 @@
     display:block;
     height:5px;
     width:5px;
-    border:1px solid white;
+    border:1px solid black;
   }
+  #videoContainers iframe {
+    margin-right:10px;
+    width: calc(25% - 7.5px);
+    height: auto;
+  }
+
+  #videoContainers iframe:last-child {
+    margin-right: 0px;
+  }
+
 </style>
 </head>
 <body>
-  <div id="headings">
+  <div id="videoContainers">
   </div>
   <div id="selectables">
   </div>
@@ -51,44 +57,52 @@
     //          Därefter har du "interval" som bestämmer hur lång tid det tar mellan
     //          Varje byte i millisekunder (1000ms = 1sek)
     //
-    var text        =  [
-          "Wireless Communication Systems",
-          "Radar Systems",
-          "Signal Processing"
+    var links        =  [
+          //PAGE 1
+          ["https://www.youtube.com/embed/Nab83-CH_Qg", "https://www.youtube.com/embed/Nab83-CH_Qg",
+            "https://www.youtube.com/embed/Nab83-CH_Qg", "https://www.youtube.com/embed/Nab83-CH_Qg"],
+          //PAGE 2
+          ["https://www.youtube.com/embed/OcntBOYNiME", "https://www.youtube.com/embed/OcntBOYNiME",
+            "https://www.youtube.com/embed/OcntBOYNiME", "https://www.youtube.com/embed/OcntBOYNiME"]
         ],
         intervalMS  = 5000,
     //
     //    HÄREFTER behöver du inte göra något! =)
     //
-        animation   = 300,
-        shortAnim   = 150,
-        body        =  document.getElementById("headings"),
-        slct        =  document.getElementById("selectables"),
-        fill       = "white",
-        transparent = "rgba(0,0,0,0)",
-        active  = 0,
-        linkID      = "link",
-        headID      = "hd",
-        headings    = [],
-        divs        = [],
-        timeout     = setInterval(changeText, intervalMS);
-
+        animation          = 300,
+        shortAnim          = 150,
+        body               =  document.getElementById("videoContainers"),
+        slct               =  document.getElementById("selectables"),
+        fill               = "black",
+        transparent        = "rgba(0,0,0,0)",
+        active             = 0,
+        linkID             = "link",
+        headID             = "hd",
+        videoContainers    = [],
+        divs               = [],
+        timeout            = setInterval(changeText, intervalMS);
 
     var populate = function(){
-      for (var i = 0; i<text.length;i++){
-        appendHeading(text[i],i);
+      for (var i = 0; i<links.length;i++){
+        appendHeading(links[i],i);
         appendListItem(i);
       }
     }
-    var appendHeading = function(string, i){
-        var h1 = document.createElement("h1");
-        h1.setAttribute("id", headID+i);
-        h1.innerHTML = string;
-        h1.style.transition = "left "+animation+"ms ease-in, display "+shortAnim+"ms";
-        headings.push(h1);
-        body.appendChild(h1);
-        if (i==0)
-          h1.style.display ="block";
+    var appendHeading = function(_links, i){
+      // var videoMargin = 10 * (_links.length-1);
+      // var width = (document.getElementsByTagName("BODY")[0].offsetWidth - videoMargin)/_links.length;
+      var width = 30/4;
+      var transition = "left "+animation+"ms ease-in, display "+shortAnim+"ms";
+      console.log(width);
+      var div = document.createElement("div");
+      div.setAttribute("id", headID+i);
+      div.style.transition = transition;
+      for (var i=0; i<_links.length; i++)
+        div.innerHTML += "<iframe src='"+_links[i]+"' frameborder='0' style='"+transition+"' allowfullscreen></iframe>"
+      videoContainers.push(div);
+      body.appendChild(div);
+      if (i==0)
+        div.style.display ="block";
     }
     var appendListItem = function(i){
         var a   = document.createElement("a"),
@@ -125,13 +139,13 @@
     }
     var swipeLeft = function(newActive){
       var _active = active;
-      headings[_active].style.left ="-500px";
-      headings[newActive].style.left ="+500px";
+      videoContainers[_active].style.left ="-500px";
+      videoContainers[newActive].style.left ="+500px";
       setTimeout(function(){
-        headings[_active].style.display ="none";
-        headings[newActive].style.display = "block";
+        videoContainers[_active].style.display ="none";
+        videoContainers[newActive].style.display = "block";
         setTimeout(function(){
-          headings[newActive].style.left ="0px";
+          videoContainers[newActive].style.left ="0px";
         },10);
       },animation);
       changeLink(newActive);
@@ -139,22 +153,24 @@
     }
     var swipeRight = function(newActive){
       var _active = active;
-      headings[_active].style.left ="+500px";
-      headings[newActive].style.left ="-500px";
+      videoContainers[_active].style.left ="+500px";
+      videoContainers[newActive].style.left ="-500px";
       setTimeout(function(){
-        headings[_active].style.display ="none";
-        headings[newActive].style.display ="block";
+        videoContainers[_active].style.display ="none";
+        videoContainers[newActive].style.display ="block";
         setTimeout(function(){
-          headings[newActive].style.left ="0px";
+          videoContainers[newActive].style.left ="0px";
         },10);
       },animation);
       changeLink(newActive);
       active = newActive;
     }
     var changeText = function(){
-      var newText = (active+1) % text.length;
+      var newText = (active+1) % links.length;
       swipeText(newText);
     }
+
+
     populate();
     changeText();
   })();
